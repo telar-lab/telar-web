@@ -3,9 +3,13 @@ package handler
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
+	handler "github.com/openfaas-incubator/go-function-sdk"
+
 	coreServer "github.com/red-gold/telar-core/server"
+	libs "github.com/red-gold/telar-core/server"
 	"github.com/red-gold/telar-web/src/controllers"
 	cf "github.com/red-gold/telar-web/src/controllers/users/auth/config"
 	"github.com/red-gold/telar-web/src/controllers/users/auth/handlers"
@@ -22,8 +26,8 @@ func init() {
 }
 
 // Handler function
-func Handle(w http.ResponseWriter, r *http.Request) {
-
+func Handler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Start handler")
 	ctx := context.Background()
 
 	// Start
@@ -44,6 +48,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		server = coreServer.NewServerRouter()
 
 		// Admin
+		server.POSTWR("/", handlers.CheckAdminHandler(db), coreServer.RouteProtectionPublic)
 		server.POSTWR("/check/admin", handlers.CheckAdminHandler(db), coreServer.RouteProtectionHMAC)
 		server.POSTWR("/signup/admin", handlers.AdminSignupHandle(db), coreServer.RouteProtectionHMAC)
 		server.POSTWR("/login/admin", handlers.LoginAdminHandler(db), coreServer.RouteProtectionHMAC)
@@ -72,4 +77,12 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		server.PUTWR("/profile", handlers.UpdateProfileHandle(db), coreServer.RouteProtectionCookie)
 	}
 	server.ServeHTTP(w, r)
+}
+
+func CheckAdminHandler(db interface{}) func(http.ResponseWriter, *http.Request, libs.Request) (handler.Response, error) {
+
+	return func(w http.ResponseWriter, r *http.Request, req libs.Request) (handler.Response, error) {
+		return handler.Response{StatusCode: http.StatusOK, Body: []byte("Hello body")},
+			nil
+	}
 }
