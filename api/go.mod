@@ -18,3 +18,5 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210220000619-9bb904979d93 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 )
+
+replace github.com/satori/go.uuid => github.com/gofrs/uuid v4.0.0+incompatible
